@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earth's Memory 検索 | 記憶の書庫</title>
+  <meta name="description" content="Throne and Liberty Earth's Memoryクイズ全287問の正誤を即座に確認できる日本語検索ツール">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Noto+Serif+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+  <style>
+    :root {
+      --bg:        #060810;
+      --bg-card:   #0b0e1c;
+      --bg-input:  #08090f;
+      --gold:      #c9a84c;
+      --gold-glow: rgba(201,168,76,.08);
+      --g-border:  rgba(201,168,76,.22);
+      --true:      #52d98a;
+      --true-bg:   rgba(82,217,138,.10);
+      --true-bd:   rgba(82,217,138,.30);
+      --false:     #e86e6e;
+      --false-bg:  rgba(232,110,110,.10);
+      --false-bd:  rgba(232,110,110,.30);
+      --t1:        #e0d4be;
+      --t2:        #8a7d6e;
+      --t3:        #3e3830;
+      --radius:    3px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { font-size:16px; scroll-behavior:smooth; }
+    body {
+      background: var(--bg);
+      color: var(--t1);
+      font-family: 'Noto Serif JP', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image:
+        radial-gradient(1px 1px at 12% 18%, rgba(201,168,76,.55) 0%,transparent 100%),
+        radial-gradient(1px 1px at 88% 12%, rgba(255,255,255,.30) 0%,transparent 100%),
+        radial-gradient(1px 1px at 34% 72%, rgba(201,168,76,.40) 0%,transparent 100%),
+        radial-gradient(1px 1px at 70% 55%, rgba(255,255,255,.22) 0%,transparent 100%),
+        radial-gradient(1px 1px at 55% 30%, rgba(201,168,76,.35) 0%,transparent 100%),
+        radial-gradient(2px 2px at 22% 85%, rgba(201,168,76,.18) 0%,transparent 100%),
+        radial-gradient(1px 1px at 92% 78%, rgba(255,255,255,.28) 0%,transparent 100%),
+        radial-gradient(1px 1px at 47%  5%, rgba(255,255,255,.35) 0%,transparent 100%),
+        radial-gradient(1px 1px at 78% 90%, rgba(201,168,76,.30) 0%,transparent 100%),
+        radial-gradient(1px 1px at  6% 45%, rgba(255,255,255,.20) 0%,transparent 100%);
+    }
+    body::after {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+      background: radial-gradient(ellipse 80% 60% at 50% 30%,transparent 30%,rgba(6,8,16,.75) 100%);
+    }
+    .wrap { position:relative; z-index:1; max-width:880px; margin:0 auto; padding:0 1.1rem; }
+
+    /* ── header ── */
+    header { text-align:center; padding:2.8rem 1rem 0; }
+    .orn { display:flex; align-items:center; justify-content:center; gap:.9rem; margin-bottom:1.4rem; }
+    .orn-line { flex:1; max-width:110px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+    .orn-dia  { width:7px; height:7px; background:var(--gold); transform:rotate(45deg); flex-shrink:0; }
+    h1 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.5rem, 5vw, 2.6rem);
+      font-weight: 700; letter-spacing:.08em;
+      background: linear-gradient(175deg, #f5e08a 0%, #c9a84c 45%, #7a5c18 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      line-height:1.15; margin-bottom:.55rem;
+    }
+    .subtitle { font-size:.82rem; font-weight:300; letter-spacing:.35em; color:var(--t2); margin-bottom:.35rem; }
+    .attr { font-size:.65rem; color:var(--t3); letter-spacing:.08em; }
+    .attr a { color:var(--gold); text-decoration:none; opacity:.65; }
+    .attr a:hover { opacity:1; }
+
+    /* ── search ── */
+    .search-wrap { padding:1.8rem 0 1.2rem; }
+    .search-row { position:relative; }
+    .ico-search {
+      position:absolute; left:1.1rem; top:50%; transform:translateY(-50%);
+      color:var(--gold); opacity:.6; pointer-events:none; font-size:1rem; line-height:1;
+    }
+    #q {
+      width:100%; background:var(--bg-input); border:1px solid var(--g-border);
+      border-radius:var(--radius); padding:.9rem 2.8rem .9rem 2.8rem;
+      color:var(--t1); font-family:'Noto Serif JP',serif; font-size:.95rem;
+      outline:none; transition:border-color .25s,box-shadow .25s; -webkit-appearance:none;
+    }
+    #q::placeholder { color:var(--t3); }
+    #q:focus { border-color:rgba(201,168,76,.55); box-shadow:0 0 0 2px var(--gold-glow),0 0 18px var(--gold-glow); }
+    #clr {
+      position:absolute; right:1rem; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:var(--t2); cursor:pointer;
+      font-size:1.1rem; line-height:1; padding:.25rem;
+      opacity:0; pointer-events:none; transition:opacity .2s,color .2s;
+    }
+    #clr.show { opacity:1; pointer-events:auto; }
+    #clr:hover { color:var(--gold); }
+    .meta { display:flex; align-items:center; justify-content:space-between; margin-top:.6rem; font-size:.7rem; }
+    #cnt { color:var(--t2); }
+    .cnt-num { color:var(--gold); font-weight:600; }
+    .hint { color:var(--t3); font-size:.68rem; }
+
+    /* ── cards ── */
+    #res { display:flex; flex-direction:column; gap:.55rem; padding-bottom:5rem; }
+    @keyframes up { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
+    .card {
+      background:var(--bg-card); border:1px solid rgba(255,255,255,.04);
+      border-radius:var(--radius); display:grid; grid-template-columns:56px 1fr;
+      gap:0 .9rem; align-items:stretch; overflow:hidden;
+      animation:up .3s ease both; transition:box-shadow .2s,border-color .2s;
+    }
+    .card:hover { border-color:rgba(201,168,76,.12); box-shadow:0 2px 18px rgba(0,0,0,.35); }
+    .badge {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:.8rem .3rem; gap:.15rem;
+      font-family:'Cinzel',serif; font-weight:600; border-right:1px solid;
+    }
+    .badge .sym { font-size:1.45rem; line-height:1; }
+    .badge .lbl { font-size:.5rem; letter-spacing:.06em; text-transform:uppercase; }
+    .card.T .badge { background:var(--true-bg);  border-color:var(--true-bd);  color:var(--true);  }
+    .card.F .badge { background:var(--false-bg); border-color:var(--false-bd); color:var(--false); }
+    .body  { padding:.75rem .9rem .75rem 0; min-width:0; }
+    .qja   { font-size:.88rem; line-height:1.75; color:var(--t1); margin-bottom:.3rem; word-break:break-all; }
+    .qen   { font-size:.65rem; color:var(--t3); line-height:1.55; font-family:'Cinzel',serif; letter-spacing:.02em; word-break:break-all; }
+    .foot  { display:flex; align-items:center; justify-content:space-between; margin-top:.45rem; }
+    .qid   { font-size:.62rem; color:var(--t3); font-family:'Cinzel',serif; }
+    .cat   { font-size:.58rem; color:var(--t3); border:1px solid var(--t3); padding:.08rem .45rem; border-radius:2px; letter-spacing:.04em; opacity:.7; font-family:'Cinzel',serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px; }
+
+    /* ── states ── */
+    .empty { text-align:center; padding:4rem 1rem; color:var(--t3); }
+    .empty .sym2 { font-size:2.5rem; margin-bottom:.9rem; opacity:.25; }
+    .empty p { font-size:.85rem; line-height:1.8; }
+    .loading { text-align:center; padding:3.5rem; color:var(--gold); font-family:'Cinzel',serif; font-size:.75rem; letter-spacing:.25em; }
+    @keyframes blink { 0%,100%{opacity:.2} 50%{opacity:1} }
+    .loading span { animation:blink 1.4s infinite; }
+    .loading span:nth-child(2) { animation-delay:.2s; }
+    .loading span:nth-child(3) { animation-delay:.4s; }
+
+    /* ── footer ── */
+    footer { text-align:center; padding:1.8rem 1rem; border-top:1px solid var(--g-border); font-size:.65rem; color:var(--t3); margin-top:2rem; }
+    footer a { color:var(--gold); text-decoration:none; opacity:.6; }
+    footer a:hover { opacity:1; }
+
+    @media (max-width:480px) {
+      h1 { font-size:1.35rem; }
+      .card { grid-template-columns:46px 1fr; gap:0 .7rem; }
+      .badge .sym { font-size:1.25rem; }
+      .badge .lbl { font-size:.45rem; }
+      .qja { font-size:.82rem; }
+      .body { padding:.65rem .7rem .65rem 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="orn">
+      <div class="orn-line"></div>
+      <div class="orn-dia"></div>
+      <div class="orn-line"></div>
+    </div>
+    <h1>Earth's Memory</h1>
+    <p class="subtitle">記 憶 の 書 庫</p>
+    <p class="attr">Throne and Liberty — クイズ設問検索 &nbsp;|&nbsp; 原著コンパイル: <a href="#" target="_blank" rel="noopener noreferrer">Kninebeat</a> 氏</p>
+  </header>
+
+  <section class="search-wrap">
+    <div class="search-row">
+      <span class="ico-search" aria-hidden="true">⚲</span>
+      <input id="q" type="search" placeholder="記憶を探す…　日本語・英語どちらでも" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="クイズ検索">
+      <button id="clr" aria-label="検索をクリア">✕</button>
+    </div>
+    <div class="meta">
+      <span id="cnt" aria-live="polite"></span>
+      <span class="hint">ゲーム内のセリフをそのまま貼り付けてもOK</span>
+    </div>
+  </section>
+
+  <main id="res" aria-label="検索結果">
+    <div class="loading" aria-label="読み込み中">LOADING<span>.</span><span>.</span><span>.</span></div>
+  </main>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    原著コンパイル: <a href="#" target="_blank" rel="noopener noreferrer">Kninebeat</a> 氏 &nbsp;·&nbsp;
+    <a href="../nix-datamine-jp.html">NIX DATAMINE JP</a> に戻る
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var qEl  = document.getElementById('q');
+  var clr  = document.getElementById('clr');
+  var res  = document.getElementById('res');
+  var cnt  = document.getElementById('cnt');
+
+  var data = [];
+  var fuse = null;
+  var timer;
+
+  /* ── DOM helpers (no innerHTML for user data) ── */
+
+  function el(tag, cls) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    return e;
+  }
+
+  function txt(tag, cls, text) {
+    var e = el(tag, cls);
+    e.textContent = text;
+    return e;
+  }
+
+  function makeCard(item, delay) {
+    var isTrue = item.answer === 'TRUE';
+    var article = el('article', 'card ' + (isTrue ? 'T' : 'F'));
+    article.style.animationDelay = delay + 's';
+
+    /* badge */
+    var badge = el('div', 'badge');
+    var sym = txt('span', 'sym', isTrue ? '✓' : '✗');
+    var lbl = txt('span', 'lbl', isTrue ? 'TRUE' : 'FALSE');
+    badge.appendChild(sym);
+    badge.appendChild(lbl);
+
+    /* body */
+    var body = el('div', 'body');
+    var qja  = txt('p', 'qja', item.text_ja || item.text_en);
+    body.appendChild(qja);
+
+    if (item.text_ja) {
+      var qen = txt('p', 'qen', item.text_en);
+      body.appendChild(qen);
+    }
+
+    var foot = el('div', 'foot');
+    var qid  = txt('span', 'qid', '#' + String(item.id).padStart(3, '0'));
+    var cat  = txt('span', 'cat', item.category);
+    foot.appendChild(qid);
+    foot.appendChild(cat);
+    body.appendChild(foot);
+
+    article.appendChild(badge);
+    article.appendChild(body);
+    return article;
+  }
+
+  /* ── render ── */
+
+  function render(items) {
+    while (res.firstChild) res.removeChild(res.firstChild);
+
+    if (!items.length) {
+      var empty = el('div', 'empty');
+      var sym2 = el('div', 'sym2');
+      sym2.textContent = '📜';
+      var msg = el('p');
+      msg.textContent = '該当する記憶が見つかりませんでした。別のキーワードでお試しください。';
+      empty.appendChild(sym2);
+      empty.appendChild(msg);
+      res.appendChild(empty);
+      cnt.textContent = '';
+      var strong0 = el('strong', 'cnt-num');
+      strong0.textContent = '0';
+      cnt.prepend(strong0);
+      cnt.appendChild(document.createTextNode(' 件'));
+      return;
+    }
+
+    var frag = document.createDocumentFragment();
+    items.forEach(function (item, i) {
+      frag.appendChild(makeCard(item, Math.min(i, 15) * 0.022));
+    });
+    res.appendChild(frag);
+
+    cnt.textContent = '';
+    var strong = el('strong', 'cnt-num');
+    strong.textContent = String(items.length);
+    cnt.appendChild(strong);
+    cnt.appendChild(document.createTextNode(' / ' + data.length + ' 件'));
+  }
+
+  /* ── search ── */
+
+  function doSearch(q) {
+    if (!q) { render(data); return; }
+    var hits = fuse.search(q);
+    render(hits.map(function (r) { return r.item; }));
+  }
+
+  qEl.addEventListener('input', function () {
+    var v = qEl.value.trim();
+    clr.classList.toggle('show', v.length > 0);
+    clearTimeout(timer);
+    timer = setTimeout(function () { doSearch(v); }, 140);
+  });
+
+  clr.addEventListener('click', function () {
+    qEl.value = '';
+    clr.classList.remove('show');
+    render(data);
+    qEl.focus();
+  });
+
+  /* ── load ── */
+
+  fetch('./earths_memory_qa.json')
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (json) {
+      if (!Array.isArray(json)) throw new Error('invalid data');
+      data = json;
+      fuse = new Fuse(data, {
+        keys: [
+          { name: 'text_ja', weight: 0.75 },
+          { name: 'text_en', weight: 0.25 }
+        ],
+        threshold: 0.42,
+        includeScore: true,
+        minMatchCharLength: 2,
+        ignoreLocation: true,
+        distance: 800
+      });
+      render(data);
+    })
+    .catch(function () {
+      while (res.firstChild) res.removeChild(res.firstChild);
+      var d = el('div', 'empty');
+      var p = el('p');
+      p.textContent = 'データの読み込みに失敗しました。earths_memory_qa.json が同じディレクトリにあるか確認してください。';
+      d.appendChild(p);
+      res.appendChild(d);
+    });
+
+}());
+</script>
+</body>
+</html>
