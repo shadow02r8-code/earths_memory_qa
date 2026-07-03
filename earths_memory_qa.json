@@ -1,6 +1,6 @@
 ﻿[
   {"id":1,"answer":"TRUE","text_en":"The Snow Fiends are demons that appear in the Scar of Sacrifice.","text_ja":"雪鬼は犠牲の傷跡に出現する魔族だ。","category":"Nix"},
-  {"id":2,"answer":"TRUE","text_en":"The Frozen Nightlands of Nix are home to packs of werewolves.","text_ja":"ニックスのフローズン・ナイトランズには、ウェアウルフの群れが生息している。","category":"Nix"},
+  {"id":2,"answer":"TRUE","text_en":"The Frozen Nightlands of Nix are home to packs of werewolves.","text_ja":"ニックスの雪夜の地には、ウェアウルフの群れが生息している。","category":"Nix"},
   {"id":3,"answer":"TRUE","text_en":"Vulcanus is a variant created by combining a Snowfield Gorilla and an Acid Beetle.","text_ja":"ヴァルカナスは、スノーフィールド・ゴリラとアシッド・ビートルを組み合わせた変種である。","category":"Nix"},
   {"id":4,"answer":"TRUE","text_en":"There is no Arkeum Legion in Nix.","text_ja":"ニックスにアーキウム軍団は存在しない。","category":"Nix"},
   {"id":5,"answer":"TRUE","text_en":"In the aftermath of the ancient war between the elves and the giants, a rift to Diabolica opened in Nix.","text_ja":"精霊族と巨人族の古代戦争の後、ニックスにディアボリカへの亀裂が開いた。","category":"Nix"},
@@ -51,7 +51,7 @@
   {"id":50,"answer":"TRUE","text_en":"The name of the sundries merchant in Vienta Village is Deborah.","text_ja":"ヴィエンタ村の雑貨商の名前はデボラである。","category":"Laslan"},
   {"id":51,"answer":"TRUE","text_en":"The Aethersuit is a device used to rapidly descend from the Aetherion to the ground.","text_ja":"エーテルスーツはエーテリオンから地上へ素早く降下するための装置である。","category":"Laslan"},
   {"id":52,"answer":"TRUE","text_en":"Martinay Casill is Adriana Casill's younger sister.","text_ja":"マーティネイ・カシルはアドリアナ・カシルの妹である。","category":"Laslan"},
-  {"id":53,"answer":"TRUE","text_en":"The temple built by the lycanthropes of Nix is on the opposite side of the waterfall in the Frozen Nightlands.","text_ja":"ニックスのライカンが建てた神殿は、フローズン・ナイトランズの滝の反対側にある。","category":"Nix"},
+  {"id":53,"answer":"TRUE","text_en":"The temple built by the lycanthropes of Nix is on the opposite side of the waterfall in the Frozen Nightlands.","text_ja":"ニックスのライカンが建てた神殿は、雪夜の地の滝の反対側にある。","category":"Nix"},
   {"id":54,"answer":"TRUE","text_en":"When you cook, you get a great success sometimes.","text_ja":"料理をすると、時々大成功が出ることがある。","category":"Real World Trivia"},
   {"id":55,"answer":"TRUE","text_en":"A Guardian's Pledge is an object imbued with a Guardian through a special ceremony.","text_ja":"ガーディアンの誓約は、特別な儀式を通じてガーディアンを宿したものである。","category":"Story / General"},
   {"id":56,"answer":"TRUE","text_en":"The red fog originates from Abyssal Meteor fragments and causes mutations in living creatures.","text_ja":"赤霧は深淵隕石の欠片から生じ、生き物に変異をもたらす。","category":"Ancient War / Lore General"},
