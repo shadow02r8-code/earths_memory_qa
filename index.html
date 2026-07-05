@@ -139,6 +139,21 @@
     .loading span:nth-child(2) { animation-delay:.2s; }
     .loading span:nth-child(3) { animation-delay:.4s; }
 
+    /* ── lang toggle ── */
+    .lang-toggle {
+      display:flex; border:1px solid var(--g-border); border-radius:var(--radius);
+      overflow:hidden; flex-shrink:0;
+    }
+    .lang-btn {
+      background:none; border:none; cursor:pointer;
+      font-family:'Cinzel',serif; font-size:.68rem; font-weight:600;
+      letter-spacing:.12em; padding:.28rem .75rem; color:var(--t2);
+      transition:background .18s,color .18s;
+    }
+    .lang-btn.active { background:var(--gold); color:#06080f; }
+    .lang-btn:not(.active):hover { color:var(--gold); }
+    .lang-sep { width:1px; background:var(--g-border); flex-shrink:0; }
+
     /* ── footer ── */
     footer { text-align:center; padding:1.8rem 1rem; border-top:1px solid var(--g-border); font-size:.65rem; color:var(--t3); margin-top:2rem; }
     footer a { color:var(--gold); text-decoration:none; opacity:.6; }
@@ -176,7 +191,11 @@
     </div>
     <div class="meta">
       <span id="cnt" aria-live="polite"></span>
-      <span class="hint">ゲーム内のセリフをそのまま貼り付けてもOK</span>
+      <div class="lang-toggle" role="group" aria-label="表示言語">
+        <button type="button" class="lang-btn active" id="btn-ja" data-lang="ja">JA</button>
+        <div class="lang-sep"></div>
+        <button type="button" class="lang-btn" id="btn-en" data-lang="en">EN</button>
+      </div>
     </div>
   </section>
 
@@ -205,6 +224,7 @@
   var data = [];
   var fuse = null;
   var timer;
+  var lang = 'ja';
 
   /* ── DOM helpers (no innerHTML for user data) ── */
 
@@ -218,6 +238,19 @@
     var e = el(tag, cls);
     e.textContent = text;
     return e;
+  }
+
+  function makeFuse() {
+    fuse = new Fuse(data, {
+      keys: lang === 'ja'
+        ? [{ name: 'text_ja', weight: 0.75 }, { name: 'text_en', weight: 0.25 }]
+        : [{ name: 'text_en', weight: 0.75 }, { name: 'text_ja', weight: 0.25 }],
+      threshold: 0.42,
+      includeScore: true,
+      minMatchCharLength: 2,
+      ignoreLocation: true,
+      distance: 800
+    });
   }
 
   function makeCard(item, delay) {
@@ -234,11 +267,13 @@
 
     /* body */
     var body = el('div', 'body');
-    var qja  = txt('p', 'qja', item.text_ja || item.text_en);
+    var primary = lang === 'en' ? (item.text_en) : (item.text_ja || item.text_en);
+    var secondary = lang === 'en' ? (item.text_ja || '') : item.text_en;
+    var qja = txt('p', 'qja', primary);
     body.appendChild(qja);
 
-    if (item.text_ja) {
-      var qen = txt('p', 'qen', item.text_en);
+    if (secondary) {
+      var qen = txt('p', 'qen', secondary);
       body.appendChild(qen);
     }
 
@@ -297,6 +332,21 @@
     render(hits.map(function (r) { return r.item; }));
   }
 
+  function setLang(newLang) {
+    if (lang === newLang) return;
+    lang = newLang;
+    document.getElementById('btn-ja').classList.toggle('active', lang === 'ja');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    qEl.placeholder = lang === 'ja'
+      ? '記憶を探す…　日本語・英語どちらでも'
+      : 'Search memories…  English or Japanese';
+    makeFuse();
+    doSearch(qEl.value.trim());
+  }
+
+  document.getElementById('btn-ja').addEventListener('click', function () { setLang('ja'); });
+  document.getElementById('btn-en').addEventListener('click', function () { setLang('en'); });
+
   qEl.addEventListener('input', function () {
     var v = qEl.value.trim();
     clr.classList.toggle('show', v.length > 0);
@@ -318,17 +368,7 @@
     .then(function (json) {
       if (!Array.isArray(json)) throw new Error('invalid data');
       data = json;
-      fuse = new Fuse(data, {
-        keys: [
-          { name: 'text_ja', weight: 0.75 },
-          { name: 'text_en', weight: 0.25 }
-        ],
-        threshold: 0.42,
-        includeScore: true,
-        minMatchCharLength: 2,
-        ignoreLocation: true,
-        distance: 800
-      });
+      makeFuse();
       render(data);
     })
     .catch(function () {
