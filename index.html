@@ -23,9 +23,9 @@
       --false:     #e86e6e;
       --false-bg:  rgba(232,110,110,.10);
       --false-bd:  rgba(232,110,110,.30);
-      --t1:        #e0d4be;
-      --t2:        #8a7d6e;
-      --t3:        #3e3830;
+      --t1:        #ede3cd;
+      --t2:        #a89c8c;
+      --t3:        #7a6e62;
       --radius:    3px;
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -88,7 +88,7 @@
       color:var(--t1); font-family:'Noto Serif JP',serif; font-size:.95rem;
       outline:none; transition:border-color .25s,box-shadow .25s; -webkit-appearance:none;
     }
-    #q::placeholder { color:var(--t3); }
+    #q::placeholder { color:var(--t2); opacity:.6; }
     #q:focus { border-color:rgba(201,168,76,.55); box-shadow:0 0 0 2px var(--gold-glow),0 0 18px var(--gold-glow); }
     #clr {
       position:absolute; right:1rem; top:50%; transform:translateY(-50%);
@@ -107,7 +107,7 @@
     #res { display:flex; flex-direction:column; gap:.55rem; padding-bottom:5rem; }
     @keyframes up { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
     .card {
-      background:var(--bg-card); border:1px solid rgba(255,255,255,.04);
+      background:var(--bg-card); border:1px solid rgba(255,255,255,.09);
       border-radius:var(--radius); display:grid; grid-template-columns:56px 1fr;
       gap:0 .9rem; align-items:stretch; overflow:hidden;
       animation:up .3s ease both; transition:box-shadow .2s,border-color .2s;
@@ -123,15 +123,15 @@
     .card.T .badge { background:var(--true-bg);  border-color:var(--true-bd);  color:var(--true);  }
     .card.F .badge { background:var(--false-bg); border-color:var(--false-bd); color:var(--false); }
     .body  { padding:.75rem .9rem .75rem 0; min-width:0; }
-    .qja   { font-size:.88rem; line-height:1.75; color:var(--t1); margin-bottom:.3rem; word-break:break-all; }
-    .qen   { font-size:.65rem; color:var(--t3); line-height:1.55; font-family:'Cinzel',serif; letter-spacing:.02em; word-break:break-all; }
-    .foot  { display:flex; align-items:center; justify-content:space-between; margin-top:.45rem; }
-    .qid   { font-size:.62rem; color:var(--t3); font-family:'Cinzel',serif; }
-    .cat   { font-size:.58rem; color:var(--t3); border:1px solid var(--t3); padding:.08rem .45rem; border-radius:2px; letter-spacing:.04em; opacity:.7; font-family:'Cinzel',serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px; }
+    .qja   { font-size:.92rem; line-height:1.75; color:var(--t1); margin-bottom:.3rem; word-break:break-all; }
+    .qen   { font-size:.72rem; color:var(--t2); line-height:1.55; font-family:'Cinzel',serif; letter-spacing:.02em; word-break:break-all; margin-bottom:.25rem; }
+    .foot  { display:flex; align-items:center; justify-content:space-between; margin-top:.4rem; }
+    .qid   { font-size:.66rem; color:var(--t2); font-family:'Cinzel',serif; opacity:.75; }
+    .cat   { font-size:.63rem; color:var(--t2); border:1px solid rgba(168,156,140,.35); padding:.1rem .5rem; border-radius:2px; letter-spacing:.04em; font-family:'Cinzel',serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px; }
 
     /* ── states ── */
-    .empty { text-align:center; padding:4rem 1rem; color:var(--t3); }
-    .empty .sym2 { font-size:2.5rem; margin-bottom:.9rem; opacity:.25; }
+    .empty { text-align:center; padding:4rem 1rem; color:var(--t2); }
+    .empty .sym2 { font-size:2.5rem; margin-bottom:.9rem; opacity:.4; }
     .empty p { font-size:.85rem; line-height:1.8; }
     .loading { text-align:center; padding:3.5rem; color:var(--gold); font-family:'Cinzel',serif; font-size:.75rem; letter-spacing:.25em; }
     @keyframes blink { 0%,100%{opacity:.2} 50%{opacity:1} }
@@ -155,7 +155,7 @@
     .lang-sep { width:1px; background:var(--g-border); flex-shrink:0; }
 
     /* ── footer ── */
-    footer { text-align:center; padding:1.8rem 1rem; border-top:1px solid var(--g-border); font-size:.65rem; color:var(--t3); margin-top:2rem; }
+    footer { text-align:center; padding:1.8rem 1rem; border-top:1px solid var(--g-border); font-size:.65rem; color:var(--t2); margin-top:2rem; }
     footer a { color:var(--gold); text-decoration:none; opacity:.6; }
     footer a:hover { opacity:1; }
 
